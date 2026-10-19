@@ -4,8 +4,8 @@
   "codeowners": ["@netcraker01"],
   "config_flow": true,
   "documentation": "https://github.com/netcraker01/ha-ferroli-connect",
-  "issue_tracker": "https://github.com/netcraker01/ha-ferroli-connect/issues",
   "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/netcraker01/ha-ferroli-connect/issues",
   "requirements": ["aiomqtt>=2.5.0,<3"],
   "version": "0.1.0"
 }
