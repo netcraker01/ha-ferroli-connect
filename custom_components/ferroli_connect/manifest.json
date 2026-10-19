@@ -6,7 +6,6 @@
   "documentation": "https://github.com/netcraker01/ha-ferroli-connect",
   "issue_tracker": "https://github.com/netcraker01/ha-ferroli-connect/issues",
   "iot_class": "cloud_push",
-  "categories": ["climate.thermostats_heating", "climate.water_heaters"],
   "requirements": ["aiomqtt>=2.5.0,<3"],
   "version": "0.1.0"
 }
