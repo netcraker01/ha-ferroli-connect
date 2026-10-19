@@ -1,0 +1,17 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+
+# Local third-party application package (not part of this project)
+Ferroli+CONNECT_1.5.2_APKPure.apk
+
+# Local editor and OS files
+.idea/
+.vscode/
+.DS_Store

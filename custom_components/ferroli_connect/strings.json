@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {"title": "Ferroli Connect", "description": "Sign in with your Ferroli Connect account.", "data": {"username": "Username", "password": "Password"}},
+      "device": {"title": "Select device", "data": {"device": "Device"}},
+      "reauth": {"title": "Reauthenticate", "data": {"username": "Username", "password": "Password"}}
+    },
+    "error": {"cannot_connect": "Unable to sign in or retrieve devices.", "no_devices": "No devices found.", "invalid_auth": "Invalid username or password."}
+  },
+  "options": {
+    "step": {"init": {"title": "Control safety", "description": "Enabling control allows on/off commands to toggle the boiler master relay and temperature commands to change heating-water target.", "data": {"confirm_control": "I understand and enable boiler control"}}}
+  }
+}
