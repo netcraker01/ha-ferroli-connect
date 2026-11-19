@@ -235,10 +235,10 @@ def dhw_target_command(temp_c: float, **header) -> bytes:
 
 
 def decode_boiler_telemetry(packet: bytes) -> dict:
-    """Decode only source-mapped BoilerBean TLVs from a response frame."""
+    """Decode source-mapped BoilerBean TLVs from response or push frames."""
     kind, fields = parse_packet(packet)
-    if kind != 3:
-        raise ValueError("telemetry must be a response packet")
+    if kind not in (3, 0x1004):
+        raise ValueError("telemetry must be a response or push packet")
     boiler_id = fields.get(BOILER_ID_FLAG)
     if boiler_id is not None and boiler_id != BOILER_ID.to_bytes(4, "big"):
         raise ValueError("packet belongs to a different boiler")

@@ -85,6 +85,7 @@ def test_binary_telemetry_vector():
     )
     assert decode_boiler_telemetry(response) == {
         "relay_open": True, "target_temperature": 55.0,
+        "heating_water_target_temperature": 55.0,
         "current_temperature": 50, "min_temperature": 30, "max_temperature": 85,
     }
     try:
@@ -93,6 +94,36 @@ def test_binary_telemetry_vector():
         pass
     else:
         raise AssertionError("control packet accepted as telemetry")
+
+
+def test_unsolicited_telemetry_4100_vectors():
+    heating = bytes.fromhex(
+        "1004130764000001a1dfdab1f0000001a1dfd86ae3182"
+        "00000020127202400045555aaaa"
+    )
+    dhw = bytes.fromhex(
+        "1004130364000001a1dfd8dd30000001a1dfd86ae31a2"
+        "0020002011d202400045555aaaa"
+    )
+    relay = bytes.fromhex(
+        "1004130964000001a1dfdac960000001a1dfd86ae3182"
+        "011000101202400045555aaaa"
+    )
+
+    assert decode_boiler_telemetry(heating)["current_temperature"] == 29.5
+    assert decode_boiler_telemetry(dhw)["dhw_current_temperature"] == 28.5
+    assert decode_boiler_telemetry(relay)["relay_open"] is False
+
+    thermostat_push = bytes.fromhex(
+        "1004130764000001a1dfdab1f0000001a1dfd86ae31"
+        "1700000020127202400045555aaaa"
+    )
+    try:
+        decode_boiler_telemetry(thermostat_push)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("non-boiler 4100 push accepted as telemetry")
 
 
 def test_heating_active_flag_values_and_validation():
