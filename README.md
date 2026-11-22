@@ -29,7 +29,7 @@ The integration provides `climate`, `binary_sensor`, and `sensor` platforms. The
 
 | Entity | Platform | Behaviour |
 | --- | --- | --- |
-| Room thermostat | Climate | Reports room temperature, target and available thermostat state. Mode reporting is read-only. Its temperature target is the single writable control, gated by the control-safety option. In automatic mode, target reporting is limited to an active saved override; scheduled bands are not decoded. |
+| Room thermostat | Climate | Reports room temperature, target and thermostat state. Verified Heat/Off mode and temperature-target controls are gated by the control-safety option. In automatic mode, target reporting is limited to an active saved override; scheduled bands are not decoded. |
 | Heating active | Binary sensor | Read-only boiler heating-active status from MQTT telemetry. |
 | Heating water temperature | Sensor | Read-only current heating-water temperature from MQTT telemetry. |
 | Heating water target | Sensor / Number (opt-in) | Target telemetry; a gated Number control writes integer °C and requires matching MQTT telemetry readback. |
@@ -81,14 +81,14 @@ If the cloud session expires or rejects the token, Home Assistant prompts you to
 
 ### Control safety option
 
-Controls are disabled by default. In **Configure**, enable thermostat control and, separately, **I understand and enable boiler water setpoint controls** to expose heating-water and DHW Number entities. All three controls require readback confirmation; disabling the boiler option removes the Number platform. The integration reloads after options change.
+Controls are disabled by default. In **Configure**, enable thermostat temperature/Heat-Off control and, separately, **I understand and enable boiler water setpoint controls** to expose heating-water and DHW Number entities. All controls require readback confirmation; disabling the boiler option removes the Number platform. The integration reloads after options change.
 
 ## Safety & trust
 
 - Telemetry is read-only by default; control requires an explicit opt-in.
-- Verified writes are the room thermostat target, heating-water setpoint, and DHW setpoint; the boiler setpoints were live readback-tested on a real Ferroli boiler on 2026-11-09. Thermostat mode switching and master-relay control are not writable features.
+- Verified writes are the room thermostat target, Heat/Off thermostat modes, heating-water setpoint, and DHW setpoint; all were confirmed with readback on real hardware. Master-relay control is not a writable feature.
 - A command requires fresh, known thermostat state and a valid saved manual target. After publishing, the integration reads values back over HTTPS (up to three attempts); it updates state only if the result matches, with no optimistic update.
-- The implementation validates the thermostat mode and target before sending. Unknown state or an unconfirmed readback blocks/reports failure rather than claiming success.
+- The implementation validates the thermostat mode and target before sending. Heat/Off mode commands are limited to known manual or off states. Unknown state or an unconfirmed readback blocks/reports failure rather than claiming success.
 
 Room target range is 5.0–35.0 °C in 0.1 °C steps and requires known Off or manual mode and saved manual target. Boiler heating-water range is 25–85 °C; DHW is 30–65 °C, both in 1 °C steps. Each write updates state only after matching readback.
 
@@ -101,7 +101,7 @@ This comparison describes this integration and a typical local-MQTT Ferroli appr
 | Setup effort | Guided cloud login and device selection in Home Assistant. | Typically requires a reachable local MQTT broker and integration-specific broker/device configuration. |
 | Cloud dependency | Requires Ferroli Connect cloud HTTPS and MQTT over TLS. | Typically communicates through a local broker; cloud dependence varies by implementation and device provisioning. |
 | Privacy model | Account authentication and telemetry/control traffic use Ferroli's cloud services; Home Assistant stores an access token. | Can keep device communication local, depending on the implementation and any cloud-dependent provisioning. |
-| Verified control writes | Room thermostat, heating-water, and DHW targets; boiler writes were confirmed by live telemetry readback. | Control capabilities and verification depend on the specific project and hardware; check its documentation. |
+| Verified control writes | Room thermostat target, Heat/Off modes, heating-water and DHW targets; writes were confirmed by live readback. | Control capabilities and verification depend on the specific project and hardware; check its documentation. |
 | Translations | English and Spanish UI strings. | Translation availability depends on the specific project. |
 
 ## Protocol evidence and limitations

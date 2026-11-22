@@ -6,7 +6,7 @@ from homeassistant.const import UnitOfTemperature
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .codec import thermostat_temperature_command
+from .codec import thermostat_mode_command, thermostat_temperature_command
 from .const import DOMAIN
 
 
@@ -81,4 +81,19 @@ class FerroliHeating(ClimateEntity):
             expected_mode=self._state["room_mode"], expected_temperature=float(value))
 
     async def async_set_hvac_mode(self, hvac_mode):
-        raise NotImplementedError("Thermostat mode changes are not verified")
+        await self._control_allowed()
+        mode = self._state.get("room_mode")
+        if hvac_mode == HVACMode.HEAT:
+            if mode not in (1, 4) or self._state.get("room_manual_target_temperature") is None:
+                raise RuntimeError("Manual heat requires known OFF/manual mode and saved target")
+            wire_mode = 1
+        elif hvac_mode == HVACMode.OFF:
+            if mode not in (1, 4):
+                raise RuntimeError("OFF can only be sent from known OFF/manual mode")
+            wire_mode = 4
+        else:
+            raise ValueError("Only explicit manual heat and off are supported")
+        await self.runtime.control_thermostat(
+            thermostat_mode_command(self.sdid, wire_mode, **self._header()),
+            expected_mode=wire_mode,
+        )

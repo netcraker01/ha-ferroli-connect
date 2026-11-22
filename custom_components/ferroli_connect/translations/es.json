@@ -9,6 +9,6 @@
     "abort": {"reauth_successful": "Reautenticación completada"}
   },
   "options": {
-    "step": {"init": {"title": "Seguridad del control", "description": "El control del termostato permite cambiar la temperatura objetivo de ambiente, confirmado en un equipo real. Por separado, el control de consignas de la caldera permite escribir las consignas de calefacción y agua caliente sanitaria, confirmadas en un equipo real el 2026-11-09.", "data": {"confirm_control": "Entiendo y activo el control de temperatura del termostato", "confirm_boiler_setpoints": "Entiendo y activo las consignas de agua de la caldera"}}}
+    "step": {"init": {"title": "Seguridad del control", "description": "El control del termostato permite cambiar la temperatura objetivo y los modos Calefacción/Apagado, verificados en un equipo real. Por separado, el control de consignas de la caldera permite escribir las consignas de calefacción y agua caliente sanitaria, confirmadas en un equipo real el 2026-11-09.", "data": {"confirm_control": "Entiendo y activo el control de temperatura y modos del termostato", "confirm_boiler_setpoints": "Entiendo y activo las consignas de agua de la caldera"}}}
   }
 }

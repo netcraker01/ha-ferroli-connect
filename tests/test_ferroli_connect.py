@@ -69,7 +69,7 @@ def test_setup_failure_closes_runtime_and_delegates_reauth_to_home_assistant():
     asyncio.run(check(RuntimeError("setup failed"), RuntimeError))
 
 
-def test_climate_does_not_claim_unverified_control_or_state():
+def test_climate_exposes_only_verified_thermostat_controls():
     climate = (ROOT / "climate.py").read_text()
     assert "_attr_available = False" in climate
     assert '"Room thermostat"' in climate
@@ -79,8 +79,8 @@ def test_climate_does_not_claim_unverified_control_or_state():
     assert "if mode in (1, 4)" in climate and 'elif mode == 0' in climate
     assert "ClimateEntityFeature.TARGET_TEMPERATURE" in climate
     assert "else ClimateEntityFeature(0)" in climate
-    assert "thermostat_mode_command" not in climate
-    assert "NotImplementedError" in climate
+    assert "thermostat_mode_command" in climate
+    assert "NotImplementedError" not in climate
     assert "thermostat_temperature_command" in climate
 
 

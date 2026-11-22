@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).parents[1] / "custom_components" / "ferrol
 from codec import (parse_packet, query_packet, relay_command,
                    relay_is_open, target_temperature,
                    decode_boiler_telemetry, parse_thermostat_points,
-                   thermostat_temperature_command)
+                   thermostat_mode_command, thermostat_temperature_command)
 
 
 def test_relay_vectors():
@@ -221,6 +221,17 @@ def test_room_thermostat_control_vectors_and_validation():
             pass
         else:
             raise AssertionError("invalid thermostat target accepted")
+    assert thermostat_mode_command("1234abcd", 1, timestamp_ms=0) == prefix + bytes.fromhex(
+        "100f000101001700041234abcd")
+    assert thermostat_mode_command("1234abcd", 4, timestamp_ms=0) == prefix + bytes.fromhex(
+        "100f000104001700041234abcd")
+    for mode in (0, 2, 3, 5):
+        try:
+            thermostat_mode_command("1234abcd", mode, timestamp_ms=0)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("invalid thermostat mode accepted")
 
 
 if __name__ == "__main__":

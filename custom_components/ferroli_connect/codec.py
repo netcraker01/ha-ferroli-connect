@@ -22,6 +22,7 @@ ACS_MIN_FLAG = 0x200A
 ACS_MAX_FLAG = 0x2009
 THERMOSTAT_ID_FLAG = 0x0017  # ThermostatID2.java: super((short) 23), decimal.
 THERMOSTAT_MANUAL_TEMP_FLAG = 0x1010
+THERMOSTAT_MODE_FLAG = 0x100F
 
 
 def parse_thermostat_points(payload) -> dict[str, float | bool]:
@@ -97,6 +98,14 @@ def thermostat_temperature_command(sdid: str, temperature: float, **header) -> b
     # APK ThermostatActivity chains the point before thermostat(therid); the SDK
     # appends TLVs in call order (MessagePacket.java:84-85,154-156).
     return control_packet([(THERMOSTAT_MANUAL_TEMP_FLAG, deci.to_bytes(2, "big")),
+                           (THERMOSTAT_ID_FLAG, thermostat_id(sdid))], **header)
+
+
+def thermostat_mode_command(sdid: str, mode: int, **header) -> bytes:
+    """Build the verified manual-heat/off thermostat mode command."""
+    if mode not in (1, 4):
+        raise ValueError("Only explicit manual (1) and off (4) modes are supported")
+    return control_packet([(THERMOSTAT_MODE_FLAG, bytes((mode,))),
                            (THERMOSTAT_ID_FLAG, thermostat_id(sdid))], **header)
 
 

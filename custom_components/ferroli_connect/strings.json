@@ -9,6 +9,6 @@
     "abort": {"reauth_successful": "Re-authentication successful"}
   },
   "options": {
-    "step": {"init": {"title": "Control safety", "description": "Thermostat control enables the room temperature target, confirmed on real hardware. Separately, boiler setpoint control enables heating-water and domestic hot water writes, confirmed on real hardware on 2026-11-09.", "data": {"confirm_control": "I understand and enable thermostat temperature control", "confirm_boiler_setpoints": "I understand and enable boiler water setpoint controls"}}}
+    "step": {"init": {"title": "Control safety", "description": "Thermostat control enables room temperature target and verified Heat/Off mode changes. Separately, boiler setpoint control enables heating-water and domestic hot water writes, confirmed on real hardware on 2026-11-09.", "data": {"confirm_control": "I understand and enable thermostat temperature and Heat/Off control", "confirm_boiler_setpoints": "I understand and enable boiler water setpoint controls"}}}
   }
 }
