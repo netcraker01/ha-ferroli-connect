@@ -131,8 +131,8 @@ def test_heating_active_flag_values_and_validation():
         return (bytes.fromhex("0003130101") + bytes(16) + bytes.fromhex("0c") +
                 bytes.fromhex("20200001") + payload)
 
-    assert decode_boiler_telemetry(response(b"\x00"))["heating_active"] is False
-    assert decode_boiler_telemetry(response(b"\x01"))["heating_active"] is True
+    assert decode_boiler_telemetry(response(b"\x00"))["heating_active"] is True
+    assert decode_boiler_telemetry(response(b"\x01"))["heating_active"] is False
     for payload in (b"\x02", b"", b"\x00\x01"):
         try:
             decode_boiler_telemetry(response(payload))
@@ -140,6 +140,22 @@ def test_heating_active_flag_values_and_validation():
             pass
         else:
             raise AssertionError("invalid heating-active flag accepted")
+
+
+def test_heating_active_reporter_vectors():
+    heating_on = bytes.fromhex(
+        "1004131664000001a1fefe2170000001a1fefd1f6d12"
+        "0017000400ffff00100900010020140001022020000100"
+        "202400045555aaaa"
+    )
+    heating_off = bytes.fromhex(
+        "1004131564000001a1feffdec0000001a1fefd1f6d12"
+        "0017000400ffff00100900010420000002024720020002"
+        "01ec201100010120140001082020000101202400045555aaaa"
+    )
+
+    assert decode_boiler_telemetry(heating_on)["heating_active"] is True
+    assert decode_boiler_telemetry(heating_off)["heating_active"] is False
 
 
 def test_heating_and_dhw_water_temperatures_preserve_tenths():

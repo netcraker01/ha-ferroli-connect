@@ -13,7 +13,7 @@ PACKET_QUERY = 1
 BOILER_ID_FLAG = 8228  # Message.BOILER_ID
 BOILER_ID = 1431677610  # BoilerID default (0x5555554a)
 RELAY_FLAG = 8209
-HEATING_ACTIVE_FLAG = 8224  # Message.FLAG_WARMING_UP_STATUS (0x2020)
+HEATING_ACTIVE_FLAG = 8224  # 0x2020; observed 0=active, 1=inactive
 HEATING_TARGET_FLAG = 8203  # Read-only telemetry flag (0x200B)
 HEATING_CURRENT_FLAG = 0x2000
 HEATING_DHW_CURRENT_FLAG = 0x2002
@@ -265,7 +265,7 @@ def decode_boiler_telemetry(packet: bytes) -> dict:
     if HEATING_ACTIVE_FLAG in fields and len(fields[HEATING_ACTIVE_FLAG]) == 1:
         value = fields[HEATING_ACTIVE_FLAG][0]
         if value in (0, 1):
-            state["heating_active"] = value == 1
+            state["heating_active"] = value == 0
     for flag, key in ((0x2008, "min_temperature"), (0x2007, "max_temperature")):
         raw = fields.get(flag)
         if raw is not None and len(raw) == 1 and raw[0] > 0:
