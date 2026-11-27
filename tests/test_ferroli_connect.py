@@ -154,6 +154,8 @@ def test_room_thermostat_api_is_read_only_and_sensors_are_separate():
     assert "Room base target" in (ROOT / "sensor.py").read_text()
     runtime = (ROOT / "runtime.py").read_text()
     assert "control_thermostat" in runtime and "readback did not confirm" in runtime
+    assert "Heating modulation" in (ROOT / "sensor.py").read_text()
+    assert "PERCENTAGE" in (ROOT / "sensor.py").read_text()
 
 
 def test_logical_heating_and_acs_devices_preserve_entity_ids():

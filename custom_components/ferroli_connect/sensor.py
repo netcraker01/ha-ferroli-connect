@@ -1,6 +1,6 @@
 """Read-only boiler water temperature sensors."""
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
-from homeassistant.const import UnitOfTemperature
+from homeassistant.const import PERCENTAGE, UnitOfTemperature
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
@@ -14,6 +14,7 @@ SENSORS = (
     ("room_target_temperature", "room_target_temperature", "Room target"),
     ("room_base_target_temperature", "room_base_target_temperature", "Room base target"),
     ("room_override_target_temperature", "room_override_target_temperature", "Room saved override target"),
+    ("heating_modulation", "heating_modulation", "Heating modulation"),
 )
 
 
@@ -34,7 +35,11 @@ class FerroliWaterSensor(SensorEntity):
         self.runtime = hass.data[DOMAIN][entry.entry_id]
         self.state_key = state_key
         self._attr_name = name
-        if state_key in ("current_temperature", "dhw_current_temperature", "room_temperature"):
+        if state_key == "heating_modulation":
+            self._attr_native_unit_of_measurement = PERCENTAGE
+            self._attr_device_class = None
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+        elif state_key in ("current_temperature", "dhw_current_temperature", "room_temperature"):
             self._attr_state_class = SensorStateClass.MEASUREMENT
         device = entry.data["device"]
         self._attr_unique_id = f"{device.get('slug')}_{unique_suffix}"

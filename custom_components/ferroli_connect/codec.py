@@ -18,6 +18,7 @@ HEATING_TARGET_FLAG = 8203  # Read-only telemetry flag (0x200B)
 HEATING_CURRENT_FLAG = 0x2000
 HEATING_DHW_CURRENT_FLAG = 0x2002
 HEATING_DHW_TARGET_FLAG = 0x2003  # Read-only telemetry flag
+HEATING_MODULATION_FLAG = 0x2023  # Boiler heating modulation percentage
 ACS_MIN_FLAG = 0x200A
 ACS_MAX_FLAG = 0x2009
 THERMOSTAT_ID_FLAG = 0x0017  # ThermostatID2.java: super((short) 23), decimal.
@@ -271,6 +272,11 @@ def decode_boiler_telemetry(packet: bytes) -> dict:
             value = target_temperature(raw)
             if value is not None:
                 state[key] = value
+    raw = fields.get(HEATING_MODULATION_FLAG)
+    if raw is not None:
+        if len(raw) != 1 or raw[0] > 100:
+            raise ValueError("invalid heating modulation percentage")
+        state["heating_modulation"] = raw[0]
     if HEATING_ACTIVE_FLAG in fields and len(fields[HEATING_ACTIVE_FLAG]) == 1:
         value = fields[HEATING_ACTIVE_FLAG][0]
         if value in (0, 1):

@@ -109,10 +109,15 @@ def test_unsolicited_telemetry_4100_vectors():
         "1004130964000001a1dfdac960000001a1dfd86ae3182"
         "011000101202400045555aaaa"
     )
+    modulation = bytes.fromhex(
+        "1004130f64000001a2198920f8000001a2198824c81b2"
+        "0000002021e2002000201af202300011e202400045555aaaa"
+    )
 
     assert decode_boiler_telemetry(heating)["current_temperature"] == 29.5
     assert decode_boiler_telemetry(dhw)["dhw_current_temperature"] == 28.5
     assert decode_boiler_telemetry(relay)["relay_open"] is False
+    assert decode_boiler_telemetry(modulation)["heating_modulation"] == 30
 
     thermostat_push = bytes.fromhex(
         "1004130764000001a1dfdab1f0000001a1dfd86ae31"
@@ -180,6 +185,21 @@ def test_heating_and_dhw_water_temperatures_preserve_tenths():
             pass
         else:
             raise AssertionError("invalid-length water TLV accepted")
+
+
+def test_heating_modulation_percentage_vectors():
+    response = (bytes.fromhex("0003130101") + bytes(16) + b"\x0c" +
+                bytes.fromhex("202300011e"))
+    assert decode_boiler_telemetry(response)["heating_modulation"] == 30
+    for payload in (b"", b"\x01\x02", b"\x65"):
+        malformed = (bytes.fromhex("0003130101") + bytes(16) + b"\x0c" +
+                     bytes.fromhex("2023") + len(payload).to_bytes(2, "big") + payload)
+        try:
+            decode_boiler_telemetry(malformed)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("invalid heating modulation accepted")
 
 
 def test_thermostat_point_hex_vectors_and_invalid_values():

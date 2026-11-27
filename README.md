@@ -31,6 +31,7 @@ The integration provides `climate`, `binary_sensor`, and `sensor` platforms. The
 | --- | --- | --- |
 | Room thermostat | Climate | Reports room temperature, target and thermostat state. Verified Heat/Off mode and temperature-target controls are gated by the control-safety option. In automatic mode, target reporting is limited to an active saved override; scheduled bands are not decoded. |
 | Heating active | Binary sensor | Read-only boiler heating-active status from MQTT telemetry. |
+| Heating modulation | Sensor | Read-only boiler heating modulation percentage from MQTT telemetry (`0–100%`). |
 | Heating water temperature | Sensor | Read-only current heating-water temperature from MQTT telemetry. |
 | Heating water target | Sensor / Number (opt-in) | Target telemetry; a gated Number control writes integer °C and requires matching MQTT telemetry readback. |
 | Domestic hot water temperature | Sensor | Read-only current DHW temperature from MQTT telemetry. |
@@ -89,6 +90,7 @@ Controls are disabled by default. In **Configure**, enable thermostat temperatur
 - Verified writes are the room thermostat target, Heat/Off thermostat modes, heating-water setpoint, and DHW setpoint; all were confirmed with readback on real hardware. Master-relay control is not a writable feature.
 - A command requires fresh, known thermostat state and a valid saved manual target. After publishing, the integration reads values back over HTTPS (up to three attempts); it updates state only if the result matches, with no optimistic update.
 - The implementation validates the thermostat mode and target before sending. Heat/Off mode commands are limited to known manual or off states. Unknown state or an unconfirmed readback blocks/reports failure rather than claiming success.
+- Boiler heating modulation is decoded from the source-observed `0x2023` one-byte percentage field; values above 100 or malformed lengths are rejected.
 
 Room target range is 5.0–35.0 °C in 0.1 °C steps and requires known Off or manual mode and saved manual target. Boiler heating-water range is 25–85 °C; DHW is 30–65 °C, both in 1 °C steps. Each write updates state only after matching readback.
 
