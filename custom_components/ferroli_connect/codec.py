@@ -22,7 +22,7 @@ HEATING_MODULATION_FLAG = 0x2023  # Boiler heating modulation percentage
 ACS_MIN_FLAG = 0x200A
 ACS_MAX_FLAG = 0x2009
 THERMOSTAT_ID_FLAG = 0x0017  # ThermostatID2.java: super((short) 23), decimal.
-THERMOSTAT_MANUAL_TEMP_FLAG = 0x1010
+THERMOSTAT_MANUAL_TEMP_FLAG = 0x1004  # 0x1010 is stored by the cloud but ignored by the thermostat
 THERMOSTAT_MODE_FLAG = 0x100F
 
 
@@ -58,18 +58,19 @@ def parse_thermostat_points(payload) -> dict[str, float | bool]:
         parsed["room_override_target_temperature"] = saved_override
     override_active = byte_value("1016")
 
-    # APK thermostat mode 1 is manual; 1010 is the manual target.
+    # Mode 1 is manual; 1004 is the manual setpoint and 1001 the one the thermostat
+    # is running on (live-verified 2026-11-28: writing 1004 moves 1001, 1010 does not).
     # In auto mode 0 only an active override (1016 == 1) with 1017 set
     # establishes an effective target. Program schedule bands are not
     # derivable without the thermostat's version/time-program data.
     mode = byte_value("100F")
     if mode in (0, 1, 4):
         parsed["room_mode"] = mode
-    manual_target = temperature("1010")
+    manual_target = temperature("1004")
     if manual_target is not None:
         parsed["room_manual_target_temperature"] = manual_target
     if mode == 1:
-        effective = temperature("1010")
+        effective = temperature("1001")
         if effective is not None:
             parsed["room_target_temperature"] = effective
     elif mode == 0 and override_active == 1:
