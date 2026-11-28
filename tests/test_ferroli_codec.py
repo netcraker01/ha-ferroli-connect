@@ -211,13 +211,17 @@ def test_thermostat_point_hex_vectors_and_invalid_values():
     assert parse_thermostat_points({"1000": "0 01"}) == {}
     assert parse_thermostat_points({"1000": "03e9"}) == {}
     assert parse_thermostat_points(None) == {}
-    manual = parse_thermostat_points({"100F": "01", "1010": "00d7", "1001": "0078"})
-    assert manual["room_target_temperature"] == 21.5
+    # 1001 is the setpoint the thermostat runs on; it follows 1004 after the
+    # thermostat syncs. 1010 is stored by the cloud but ignored by the thermostat.
+    manual = parse_thermostat_points({"100F": "01", "1004": "00d7", "1001": "0078",
+                                      "1010": "00b4"})
+    assert manual["room_manual_target_temperature"] == 21.5
+    assert manual["room_target_temperature"] == 12.0
     assert manual["room_base_target_temperature"] == 12.0
     override = parse_thermostat_points({"100F": "00", "1016": "01", "1017": "00d7"})
     assert override["room_target_temperature"] == 21.5
     standby = parse_thermostat_points({"1000": "010a", "1001": "0078", "100F": "04",
-                                       "1010": "00d2", "1016": "00", "1017": "00d7"})
+                                       "1004": "00d2", "1016": "00", "1017": "00d7"})
     assert standby["room_override_target_temperature"] == 21.5
     assert "room_target_temperature" not in standby
     assert "room_override_target_temperature" not in parse_thermostat_points(
@@ -227,13 +231,13 @@ def test_thermostat_point_hex_vectors_and_invalid_values():
     assert "room_target_temperature" not in parse_thermostat_points(
         {"100F": "00", "1016": "00", "1001": "0078"})
     assert "room_target_temperature" not in parse_thermostat_points(
-        {"100F": "01", "1010": "bad!"})
+        {"100F": "01", "1001": "bad!"})
 
 
 def test_room_thermostat_control_vectors_and_validation():
     prefix = bytes.fromhex("0002130101") + bytes(16) + bytes.fromhex("0c")
     assert thermostat_temperature_command("1234abcd", 21.5, timestamp_ms=0) == prefix + bytes.fromhex(
-        "1010000200d7001700041234abcd")  # SDK ThermostatID2 flag is decimal 23.
+        "1004000200d7001700041234abcd")  # SDK ThermostatID2 flag is decimal 23.
     for value in (4.9, 35.1, float("nan"), float("inf"), 21.55):
         try:
             thermostat_temperature_command("1234abcd", value, timestamp_ms=0)
